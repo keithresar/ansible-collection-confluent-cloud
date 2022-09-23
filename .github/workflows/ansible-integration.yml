@@ -62,7 +62,7 @@ jobs:
         #run: ansible-test integration -v --color --retry-on-error --continue-on-error --diff --docker --coverage
         run: |
           cat tests/integration/integration_config.yml
-          #ansible-test integration -v --color --retry-on-error --continue-on-error --diff --docker --coverage
+          ansible-test integration -v --color --retry-on-error --continue-on-error --diff --docker --coverage
         working-directory: ./ansible_collections/${{env.NAMESPACE}}/${{env.COLLECTION_NAME}}
         env:
           TEST_ENV: xyz
