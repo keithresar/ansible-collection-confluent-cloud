@@ -126,7 +126,11 @@ def get_environments_info(confluent):
     else:
         environments = resources['data']
 
-    return(environments)
+    return({'x': environments})
+    confluent.module.fail_json(
+            msg='Ping failure',
+            fetch_url_info=environments,
+        )
 
 def main():
     argument_spec = confluent_argument_spec()
@@ -136,10 +140,6 @@ def main():
     module = AnsibleModule(
         argument_spec=argument_spec,
         supports_check_mode=True,
-#        argument_spec=dict(
-#            ids=dict(type='list', elements='str'),
-#            names=dict(type='list', elements='str'),
-#        ),
         mutually_exclusive=[
             ('ids', 'names')
         ]
