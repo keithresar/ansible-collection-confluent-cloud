@@ -53,12 +53,14 @@ def confluent_argument_spec():
         ),
     )
 
+
 def backoff(retry, retry_max_delay=12):
     randomness = random.randint(0, 1000) / 1000.0
     delay = 2**retry + randomness
     if delay > retry_max_delay:
         delay = retry_max_delay + randomness
     time.sleep(delay)
+
 
 class AnsibleConfluent:
     def __init__(
@@ -222,22 +224,22 @@ class AnsibleConfluent:
 
     def query(self):
         # Returns a single dict representing the resource
-        #return self.query_filter_list()
+#       #return self.query_filter_list()
         resources = self.api_query(path=self.resource_path)
         return(resources)
 
     def query_list(self, path=None, result_key=None, query_params=None):
         # Defaults
-        #self.module.exit_json(changed=False, meta={"foo": "bar"})
+#       #self.module.exit_json(changed=False, meta={"foo": "bar"})
         path = path or self.resource_path
         result_key = result_key or self.resource_result_key_plural
 
         resources = self.api_query(path=path, data=query_params)
-        #return resources[result_key] if resources else []
-        #self.module.fail_json(
-        #    msg='',
-        #    fetch_url_info=resources,
-        #)
+#       #return resources[result_key] if resources else []
+#       #self.module.fail_json(
+#       #    msg='',
+#       #    fetch_url_info=resources,
+#       #)
         return resources['data'] if resources else []
 
     """
@@ -285,7 +287,7 @@ class AnsibleConfluent:
                 method="POST",
                 data=data,
             )
-        #return resource.get(self.resource_result_key_singular) if resource else dict()
+#       #return resource.get(self.resource_result_key_singular) if resource else dict()
 
     """
     def is_diff(self, param, resource):
@@ -352,4 +354,3 @@ class AnsibleConfluent:
 
     def get_result(self, resource):
         self.module.exit_json(**self.result)
-
