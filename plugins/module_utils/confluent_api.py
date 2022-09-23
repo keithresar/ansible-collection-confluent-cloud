@@ -224,7 +224,6 @@ class AnsibleConfluent:
 
     def query(self):
         # Returns a single dict representing the resource
-#       #return self.query_filter_list()
         resources = self.api_query(path=self.resource_path)
         return(resources)
 
