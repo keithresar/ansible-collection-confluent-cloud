@@ -1,2 +1,3 @@
-# ansible-collection-confluent-cloud
-Confluent Cloud Ansible Collection
+# Ansible Collection - confluent.cloud
+
+Documentation for the collection.
