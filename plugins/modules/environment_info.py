@@ -84,7 +84,9 @@ enviroment_info:
       sample: success
 """
 
+import traceback
 from ansible.module_utils.basic import AnsibleModule
+from ansible.module_utils._text import to_native
 
 from ansible_collections.confluent.cloud.plugins.module_utils.confluent_api import AnsibleConfluent, confluent_argument_spec
 
@@ -114,44 +116,45 @@ def main():
         )
 """
 
+def get_environments_info(confluent):
+    resources = confluent.query()
+
+    if confluent.module.params.get('ids'):
+        environments = filter(lambda d: d.id in confluent.module.params.get('ids'), resources['data'])
+    elif confluent.module.params.get('names'):
+        environments = filter(lambda d: d.display_name in confluent.module.params.get('names'), resources['data'])
+    else:
+        environments = resources['data']
+
+    return(environments)
+
 def main():
+    argument_spec = confluent_argument_spec()
+    argument_spec['ids'] = dict(type='list', elements='str')
+    argument_spec['names'] = dict(type='list', elements='str')
+
     module = AnsibleModule(
-        argument_spec=dict(
-            count=dict(type='int', default=1),
-            count_offset=dict(type='int', default=1),
-            device_ids=dict(type='list', elements='str'),
-            facility=dict(),
-            features=dict(type='dict'),
-            hostnames=dict(type='list', elements='str', aliases=['name']),
-            tags=dict(type='list', elements='str'),
-            locked=dict(type='bool', default=False, aliases=['lock']),
-            operating_system=dict(),
-            plan=dict(),
-            state=dict(choices=ALLOWED_STATES, default='present'),
-            user_data=dict(default=None),
-            wait_for_public_IPv=dict(type='int', choices=[4, 6]),
-            wait_timeout=dict(type='int', default=900),
-            ipxe_script_url=dict(default=''),
-            always_pxe=dict(type='bool', default=False),
-        ),
-        required_one_of=[('device_ids', 'hostnames',)],
+        argument_spec=argument_spec,
+        supports_check_mode=True,
+#        argument_spec=dict(
+#            ids=dict(type='list', elements='str'),
+#            names=dict(type='list', elements='str'),
+#        ),
         mutually_exclusive=[
-            ('hostnames', 'device_ids'),
-            ('count', 'device_ids'),
-            ('count_offset', 'device_ids'),
+            ('ids', 'names')
         ]
     )
 
-    if not HAS_METAL_SDK:
-        module.fail_json(msg='packet-python required for this module')
-
-    state = module.params.get('state')
+    confluent = AnsibleConfluent(
+        module=module,
+        resource_path="/org/v2/environments",
+    )
 
     try:
-        module.exit_json(**act_on_devices(module, state))
+        module.exit_json(**get_environments_info(confluent))
     except Exception as e:
-        module.fail_json(msg='failed to set device state %s, error: %s' %
-                         (state, to_native(e)), exception=traceback.format_exc())
+        module.fail_json(msg='failed to get environment info, error: %s' %
+                         (to_native(e)), exception=traceback.format_exc())
 
 if __name__ == "__main__":
     main()

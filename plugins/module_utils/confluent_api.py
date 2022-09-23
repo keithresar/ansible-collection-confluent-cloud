@@ -15,7 +15,7 @@ from ansible.module_utils._text import to_native, to_text
 from ansible.module_utils.basic import env_fallback
 from ansible.module_utils.urls import fetch_url
 
-CC_USER_AGENT = "Ansible Confluent Cloud v1"
+CONFLUENT_USER_AGENT = "Ansible Confluent Cloud v1"
 
 
 def confluent_argument_spec():
@@ -103,7 +103,7 @@ class AnsibleConfluent:
         self.result = {
             "changed": False,
             "diff": dict(before=dict(), after=dict()),
-            "cc_api": {
+            "confluent_api": {
                 "api_timeout": module.params["api_timeout"],
                 "api_retries": module.params["api_retries"],
                 "api_retry_max_delay": module.params["api_retry_max_delay"],
@@ -115,7 +115,7 @@ class AnsibleConfluent:
                           self.module.params["api_secret"])
         self.headers = {
             "Authorization": "Basic %s" % (base64.standard_b64encode(auth.encode()).decode()),
-            "User-Agent": CC_USER_AGENT,
+            "User-Agent": CONFLUENT_USER_AGENT,
             "Accept": "application/json",
         }
 
