@@ -91,31 +91,6 @@ from ansible.module_utils._text import to_native
 from ansible_collections.confluent.cloud.plugins.module_utils.confluent_api import AnsibleConfluent, confluent_argument_spec
 
 
-"""
-def main():
-    argument_spec = confluent_argument_spec()
-
-    module = AnsibleModule(
-        argument_spec=argument_spec,
-        supports_check_mode=True,
-    )
-
-    confluent = AnsibleConfluent(
-        module=module,
-        resource_path="/org/v2/environments",
-    )
-
-    resources = confluent.query()
-
-    if 'kind' in resources and resources['kind'] == 'EnvironmentList':
-        confluent.module.exit_json(changed=False, meta={"ping": "pong"})
-    else:
-        module.fail_json(
-            msg='Ping failure',
-            fetch_url_info=resources,
-        )
-"""
-
 def get_environments_info(confluent):
     resources = confluent.query()
 
@@ -125,8 +100,9 @@ def get_environments_info(confluent):
         environments = filter(lambda d: d.display_name in confluent.module.params.get('names'), resources['data'])
     else:
         environments = resources['data']
+    
 
-    return({'x': environments})
+    return({e['id']:e for e in environments})
     confluent.module.fail_json(
             msg='Ping failure',
             fetch_url_info=environments,
