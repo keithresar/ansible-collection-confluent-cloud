@@ -24,11 +24,11 @@ class ModuleDocFragment(object):
         api_retries:
           description: Amount of max retries for the API requests.
           type: int
-          sample: 5
+          default: 5
         api_retry_max_delay:
           description: Exponential backoff delay in seconds between retries up to this max delay value.
           type: int
-          sample: 12
+          default: 12
         api_endpoint:
           description: Endpoint used for the API requests.
           type: str
