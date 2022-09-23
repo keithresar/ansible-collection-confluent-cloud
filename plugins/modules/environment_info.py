@@ -100,13 +100,9 @@ def get_environments_info(confluent):
         environments = filter(lambda d: d.display_name in confluent.module.params.get('names'), resources['data'])
     else:
         environments = resources['data']
-    
 
     return({e['id']:e for e in environments})
-    confluent.module.fail_json(
-            msg='Ping failure',
-            fetch_url_info=environments,
-        )
+
 
 def main():
     argument_spec = confluent_argument_spec()
@@ -131,6 +127,7 @@ def main():
     except Exception as e:
         module.fail_json(msg='failed to get environment info, error: %s' %
                          (to_native(e)), exception=traceback.format_exc())
+
 
 if __name__ == "__main__":
     main()
