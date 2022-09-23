@@ -42,7 +42,7 @@ ping:
 
 from ansible.module_utils.basic import AnsibleModule
 
-from ansible_collections.confluent.cloud.plugins.module_utils.cc_api import AnsibleConfluent, confluent_argument_spec
+from ansible_collections.confluent.cloud.plugins.module_utils.confluent_api import AnsibleConfluent, confluent_argument_spec
 
 
 def main():
