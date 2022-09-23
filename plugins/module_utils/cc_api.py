@@ -8,6 +8,7 @@ __metaclass__ = type
 
 import random
 import time
+import base64
 import urllib
 
 from ansible.module_utils._text import to_native, to_text
@@ -17,33 +18,33 @@ from ansible.module_utils.urls import fetch_url
 CC_USER_AGENT = "Ansible Confluent Cloud v1"
 
 
-def vultr_argument_spec():
+def confluent_argument_spec():
     return dict(
         api_endpoint=dict(
             type="str",
-            fallback=(env_fallback, ["CC_API_ENDPOINT"]),
+            fallback=(env_fallback, ["CONFLUENT_API_ENDPOINT"]),
             default="https://api.confluent.cloud",
         ),
         api_key=dict(
             type="str",
-            fallback=(env_fallback, ["CC_API_KEY"]),
+            fallback=(env_fallback, ["CONFLUENT_API_KEY"]),
             required=True,
         ),
         api_secret=dict(
             type="str",
-            fallback=(env_fallback, ["CC_API_SECRET"]),
+            fallback=(env_fallback, ["CONFLUENT_API_SECRET"]),
             no_log=True,
             required=True,
         ),
         api_timeout=dict(
             type="int",
-            fallback=(env_fallback, ["CC_API_TIMEOUT"]),
+            fallback=(env_fallback, ["CONFLUENT_API_TIMEOUT"]),
             default=60,
         ),
-        api_retries=dict(type="int", fallback=(env_fallback, ["CC_API_RETRIES"]), default=5),
+        api_retries=dict(type="int", fallback=(env_fallback, ["CONFLUENT_API_RETRIES"]), default=5),
         api_retry_max_delay=dict(
             type="int",
-            fallback=(env_fallback, ["CC_API_RETRY_MAX_DELAY"]),
+            fallback=(env_fallback, ["CONFLUENT_API_RETRY_MAX_DELAY"]),
             default=12,
         ),
         validate_certs=dict(
@@ -65,10 +66,8 @@ class AnsibleConfluent:
     def __init__(
         self,
         module,
-        namespace,
         resource_path,
-        ressource_result_key_singular,
-        ressource_result_key_plural=None,
+        resource_result_key_plural=None,
         resource_key_name=None,
         resource_key_id="id",
         resource_get_details=False,
@@ -78,13 +77,6 @@ class AnsibleConfluent:
     ):
 
         self.module = module
-        self.namespace = namespace
-
-        # The API resource path e.g ssh_key
-        self.ressource_result_key_singular = ressource_result_key_singular
-
-        # The API result data key e.g ssh_keys
-        self.ressource_result_key_plural = ressource_result_key_plural or "%ss" % ressource_result_key_singular
 
         # The API resource path e.g /ssh-keys
         self.resource_path = resource_path
@@ -109,7 +101,6 @@ class AnsibleConfluent:
 
         self.result = {
             "changed": False,
-            namespace: dict(),
             "diff": dict(before=dict(), after=dict()),
             "cc_api": {
                 "api_timeout": module.params["api_timeout"],
@@ -119,10 +110,10 @@ class AnsibleConfluent:
             },
         }
 
+        auth = "%s:%s" % (self.module.params["api_key"],
+                          self.module.params["api_secret"])
         self.headers = {
-            "Authorization": "Basic %s" % (base64.standard_b64encode(
-                "%s:%s" % (self.module.params["api_key"],
-                           self.module.params["api_secret"]).decode())),
+            "Authorization": "Basic %s" % (base64.standard_b64encode(auth.encode()).decode()),
             "User-Agent": CC_USER_AGENT,
             "Accept": "application/json",
         }
@@ -184,7 +175,6 @@ class AnsibleConfluent:
         )
 
 
-    """
     def query_filter_list_by_name(
         self,
         path,
@@ -214,10 +204,8 @@ class AnsibleConfluent:
             self.module.fail_json(msg="No Resource %s with %s found: %s" % (path, key_name, param_value))
 
         return dict()
-    """
 
 
-    """
     def query_filter_list(self):
         # Returns a single dict representing the resource queryied by name
         return self.query_filter_list_by_name(
@@ -225,41 +213,41 @@ class AnsibleConfluent:
             key_id=self.resource_key_id,
             get_details=self.resource_get_details,
             path=self.resource_path,
-            result_key=self.ressource_result_key_plural,
+            result_key=self.resource_result_key_plural,
         )
-    """
 
 
-    """
     def query_by_id(self, resource_id=None, path=None, result_key=None):
         # Defaults
         path = path or self.resource_path
-        result_key = result_key or self.ressource_result_key_singular
 
         resource = self.api_query(path="%s%s" % (path, "/" + resource_id if resource_id else resource_id))
         if resource:
             return resource[result_key]
 
         return dict()
-    """
 
 
-    """
     def query(self):
         # Returns a single dict representing the resource
-        return self.query_filter_list()
-    """
+        #return self.query_filter_list()
+        resources = self.api_query(path=self.resource_path)
+        return(resources)
 
 
-    """
     def query_list(self, path=None, result_key=None, query_params=None):
         # Defaults
+        #self.module.exit_json(changed=False, meta={"foo": "bar"})
         path = path or self.resource_path
-        result_key = result_key or self.ressource_result_key_plural
+        result_key = result_key or self.resource_result_key_plural
 
         resources = self.api_query(path=path, data=query_params)
-        return resources[result_key] if resources else []
-    """
+        #return resources[result_key] if resources else []
+        #self.module.fail_json(
+        #    msg='',
+        #    fetch_url_info=resources,
+        #)
+        return resources['data'] if resources else []
 
 
     """
@@ -280,7 +268,6 @@ class AnsibleConfluent:
     """
 
 
-    """
     def create_or_update(self):
         resource = self.query()
         if not resource:
@@ -288,16 +275,12 @@ class AnsibleConfluent:
         else:
             resource = self.update(resource)
         return resource
-    """
 
 
-    """
     def present(self):
         self.get_result(self.create_or_update())
-    """
 
 
-    """
     def create(self):
         data = dict()
         for param in self.resource_create_param_keys:
@@ -315,8 +298,7 @@ class AnsibleConfluent:
                 method="POST",
                 data=data,
             )
-        return resource.get(self.ressource_result_key_singular) if resource else dict()
-    """
+        #return resource.get(self.resource_result_key_singular) if resource else dict()
 
 
     """
@@ -339,7 +321,6 @@ class AnsibleConfluent:
     """
 
 
-    """
     def update(self, resource):
         data = dict()
 
@@ -361,7 +342,6 @@ class AnsibleConfluent:
                 )
                 resource = self.query_by_id(resource_id=resource[self.resource_key_id])
         return resource
-    """
 
 
     """
@@ -388,9 +368,6 @@ class AnsibleConfluent:
     """
 
 
-    """
     def get_result(self, resource):
-        self.result[self.namespace] = self.transform_result(resource)
         self.module.exit_json(**self.result)
-    """
 

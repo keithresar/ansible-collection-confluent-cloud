@@ -13,8 +13,8 @@ on:
   schedule:
     - cron: '0 8 * * *'
 env:
-  NAMESPACE: equinix
-  COLLECTION_NAME: metal
+  NAMESPACE: confluent
+  COLLECTION_NAME: cloud
 jobs:
   ###
   # Integration tests (RECOMMENDED)
@@ -28,20 +28,7 @@ jobs:
       max-parallel: 5
       matrix:
         ansible:
-          - stable-2.9 # Only if your collection supports Ansible 2.9
-          - stable-2.10
-          - devel
-        python:
-          - 2.7
-          - 3.5
-          - 3.6
-          - 3.7
-          - 3.8
-          - 3.9
-        exclude:
-          # Because ansible-test doesn't support python3.9 for Ansible 2.9
-          - ansible: stable-2.9
-            python: 3.9
+          - stable-2.13
     steps:
       - name: Check out code
         uses: actions/checkout@v2
@@ -58,22 +45,21 @@ jobs:
       - name: Install ansible-base (${{ matrix.ansible }})
         run: pip install https://github.com/ansible/ansible/archive/${{ matrix.ansible }}.tar.gz --disable-pip-version-check
 
-      # OPTIONAL If your integration test requires Python libraries or modules from other collections
-      # Install them like this
-      - name: Install collection dependencies
-        run: ansible-galaxy collection install community.crypto -p .
-
-      - name: Create integration_config.yml
-        env:
-          METAL_API_TOKEN: ${{ secrets.METAL_API_TOKEN }}
-        run: |
-          echo "api_token: ${METAL_API_TOKEN}" > tests/integration/integration_config.yml
-        working-directory: ./ansible_collections/${{env.NAMESPACE}}/${{env.COLLECTION_NAME}}
+      #- name: Create integration_config.yml
+      #  env:
+      #    CONFLUENT_API_KEY: ${{ secrets.CONFLUENT_API_KEY }}
+      #    CONFLUENT_API_SECRET: ${{ secrets.CONFLUENT_API_SECRET }}
+      #  run: |
+      #    echo "api_token: ${METAL_API_TOKEN}" > tests/integration/integration_config.yml
+      #  working-directory: ./ansible_collections/${{env.NAMESPACE}}/${{env.COLLECTION_NAME}}
 
       # Run the integration tests
       - name: Run integration test
         run: ansible-test integration -v --color --retry-on-error --continue-on-error --diff --python ${{ matrix.python }} --docker --coverage
         working-directory: ./ansible_collections/${{env.NAMESPACE}}/${{env.COLLECTION_NAME}}
+        env:
+          CONFLUENT_API_KEY: ${{ secrets.CONFLUENT_API_KEY }}
+          CONFLUENT_API_SECRET: ${{ secrets.CONFLUENT_API_SECRET }}
 
         # ansible-test support producing code coverage date
       - name: Generate coverage report
