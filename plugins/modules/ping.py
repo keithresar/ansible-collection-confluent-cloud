@@ -38,25 +38,21 @@ confluent_api:
       returned: success
       type: int
       sample: 60
-      default: 60
     api_retries:
       description: Amount of max retries for the API requests.
       returned: success
       type: int
       sample: 5
-      default: 5
     api_retry_max_delay:
       description: Exponential backoff delay in seconds between retries up to this max delay value.
       returned: success
       type: int
       sample: 12
-      default: 12
     api_endpoint:
       description: Endpoint used for the API requests.
       returned: success
       type: str
-      sample: https://api.confluent.cloud'
-      default: https://api.confluent.cloud'
+      sample: https://api.confluent.cloud
 ping:
   description: Response
   returned: success
