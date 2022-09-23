@@ -1,4 +1,5 @@
 --
-
 - confluent.cloud.ping:
+  env:
+    x: y
 
