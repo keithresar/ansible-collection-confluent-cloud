@@ -29,5 +29,6 @@
   ansible.builtin.assert:
     that:
       - result_fail is failed
+      - result_fail.fetch_url_info.status == 401
 
 
