@@ -26,7 +26,6 @@ jobs:
       matrix:
         ansible:
           - stable-2.13
-          - devel
     steps:
       - name: Check out code
         uses: actions/checkout@v2
