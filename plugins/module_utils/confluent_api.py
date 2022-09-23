@@ -230,7 +230,6 @@ class AnsibleConfluent:
 
     def query_list(self, path=None, result_key=None, query_params=None):
         # Defaults
-#       #self.module.exit_json(changed=False, meta={"foo": "bar"})
         path = path or self.resource_path
         result_key = result_key or self.resource_result_key_plural
 
