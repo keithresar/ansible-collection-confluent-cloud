@@ -49,14 +49,19 @@ jobs:
         env:
           CONFLUENT_API_KEY: ${{ secrets.CONFLUENT_API_KEY }}
           CONFLUENT_API_SECRET: ${{ secrets.CONFLUENT_API_SECRET }}
+          COLLECTION_NAME: ${{ env.COLLECTION_NAME }}
         run: |
           echo "api_key: ${CONFLUENT_API_KEY}" > tests/integration/integration_config.yml
           echo "api_secret: ${CONFLUENT_API_SECRET}" >> tests/integration/integration_config.yml
+          cat tests/integration/integration_config.yml
         working-directory: ./ansible_collections/${{env.NAMESPACE}}/${{env.COLLECTION_NAME}}
 
       # Run the integration tests
       - name: Run integration test
-        run: ansible-test integration -v --color --retry-on-error --continue-on-error --diff --docker --coverage
+        #run: ansible-test integration -v --color --retry-on-error --continue-on-error --diff --docker --coverage
+        run: |
+          ansible-test integration -v --color --retry-on-error --continue-on-error --diff --docker --coverage
+          cat tests/integration/integration_config.yml
         working-directory: ./ansible_collections/${{env.NAMESPACE}}/${{env.COLLECTION_NAME}}
         env:
           TEST_ENV: xyz
