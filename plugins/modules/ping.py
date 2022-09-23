@@ -85,7 +85,7 @@ def main():
 
     resources = confluent.query()
 
-    if 'kind' in resources and resources['kind']=='EnvironmentList':
+    if 'kind' in resources and resources['kind'] == 'EnvironmentList':
         confluent.module.exit_json(changed=False, meta={"ping": "pong"})
     else:
         module.fail_json(

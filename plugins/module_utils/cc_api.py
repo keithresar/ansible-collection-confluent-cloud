@@ -53,14 +53,12 @@ def confluent_argument_spec():
         ),
     )
 
-
 def backoff(retry, retry_max_delay=12):
     randomness = random.randint(0, 1000) / 1000.0
     delay = 2**retry + randomness
     if delay > retry_max_delay:
         delay = retry_max_delay + randomness
     time.sleep(delay)
-
 
 class AnsibleConfluent:
     def __init__(
@@ -121,10 +119,8 @@ class AnsibleConfluent:
         # Hook custom configurations
         self.configure()
 
-
     def configure(self):
         pass
-
 
     def api_query(self, path, method="GET", data=None):
 
@@ -174,7 +170,6 @@ class AnsibleConfluent:
             fetch_url_info=info,
         )
 
-
     def query_filter_list_by_name(
         self,
         path,
@@ -205,7 +200,6 @@ class AnsibleConfluent:
 
         return dict()
 
-
     def query_filter_list(self):
         # Returns a single dict representing the resource queryied by name
         return self.query_filter_list_by_name(
@@ -215,7 +209,6 @@ class AnsibleConfluent:
             path=self.resource_path,
             result_key=self.resource_result_key_plural,
         )
-
 
     def query_by_id(self, resource_id=None, path=None, result_key=None):
         # Defaults
@@ -227,13 +220,11 @@ class AnsibleConfluent:
 
         return dict()
 
-
     def query(self):
         # Returns a single dict representing the resource
         #return self.query_filter_list()
         resources = self.api_query(path=self.resource_path)
         return(resources)
-
 
     def query_list(self, path=None, result_key=None, query_params=None):
         # Defaults
@@ -248,7 +239,6 @@ class AnsibleConfluent:
         #    fetch_url_info=resources,
         #)
         return resources['data'] if resources else []
-
 
     """
     def wait_for_state(self, resource, key, state, cmp="="):
@@ -267,7 +257,6 @@ class AnsibleConfluent:
         return resource
     """
 
-
     def create_or_update(self):
         resource = self.query()
         if not resource:
@@ -276,10 +265,8 @@ class AnsibleConfluent:
             resource = self.update(resource)
         return resource
 
-
     def present(self):
         self.get_result(self.create_or_update())
-
 
     def create(self):
         data = dict()
@@ -300,7 +287,6 @@ class AnsibleConfluent:
             )
         #return resource.get(self.resource_result_key_singular) if resource else dict()
 
-
     """
     def is_diff(self, param, resource):
         value = self.module.params.get(param)
@@ -319,7 +305,6 @@ class AnsibleConfluent:
 
         return False
     """
-
 
     def update(self, resource):
         data = dict()
@@ -343,7 +328,6 @@ class AnsibleConfluent:
                 resource = self.query_by_id(resource_id=resource[self.resource_key_id])
         return resource
 
-
     """
     def absent(self):
         resource = self.query()
@@ -361,12 +345,10 @@ class AnsibleConfluent:
         self.get_result(resource)
     """
 
-
     """
     def transform_result(self, resource):
         return resource
     """
-
 
     def get_result(self, resource):
         self.module.exit_json(**self.result)
