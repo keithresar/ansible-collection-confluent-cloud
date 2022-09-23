@@ -45,17 +45,18 @@ jobs:
       - name: Install ansible-base (${{ matrix.ansible }})
         run: pip install https://github.com/ansible/ansible/archive/${{ matrix.ansible }}.tar.gz --disable-pip-version-check
 
-      #- name: Create integration_config.yml
-      #  env:
-      #    CONFLUENT_API_KEY: ${{ secrets.CONFLUENT_API_KEY }}
-      #    CONFLUENT_API_SECRET: ${{ secrets.CONFLUENT_API_SECRET }}
-      #  run: |
-      #    echo "api_token: ${METAL_API_TOKEN}" > tests/integration/integration_config.yml
-      #  working-directory: ./ansible_collections/${{env.NAMESPACE}}/${{env.COLLECTION_NAME}}
+      - name: Create integration_config.yml
+        env:
+          CONFLUENT_API_KEY: ${{ secrets.CONFLUENT_API_KEY }}
+          CONFLUENT_API_SECRET: ${{ secrets.CONFLUENT_API_SECRET }}
+        run: |
+          echo "api_key: ${CONFLUENT_API_KEY}" > tests/integration/integration_config.yml
+          echo "api_secret: ${CONFLUENT_API_SECRET}" >> tests/integration/integration_config.yml
+        working-directory: ./ansible_collections/${{env.NAMESPACE}}/${{env.COLLECTION_NAME}}
 
       # Run the integration tests
       - name: Run integration test
-        run: CONFLUENT_API_KEY=${{ secrets.CONFLUENT_API_KEY }} ansible-test integration -v --color --retry-on-error --continue-on-error --diff --docker --coverage
+        run: ansible-test integration -v --color --retry-on-error --continue-on-error --diff --docker --coverage
         working-directory: ./ansible_collections/${{env.NAMESPACE}}/${{env.COLLECTION_NAME}}
         env:
           TEST_ENV: xyz
