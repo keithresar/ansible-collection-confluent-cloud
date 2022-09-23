@@ -1,5 +1,11 @@
---
-- confluent.cloud.ping:
-  env:
-    x: y
+---
+- name: Exec ping
+  confluent.cloud.ping:
+  register: result
+  check_mode: true
+
+- name: verify test returned pong
+  ansible.builtin.assert:
+    that:
+      - result.meta.ping=="pong"
 
