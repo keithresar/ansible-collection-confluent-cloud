@@ -55,7 +55,7 @@ jobs:
 
       # Run the integration tests
       - name: Run integration test
-        run: CONFLUENT_API_KEY: ${{ secrets.CONFLUENT_API_KEY }} ansible-test integration -v --color --retry-on-error --continue-on-error --diff --docker --coverage
+        run: CONFLUENT_API_KEY=${{ secrets.CONFLUENT_API_KEY }} ansible-test integration -v --color --retry-on-error --continue-on-error --diff --docker --coverage
         working-directory: ./ansible_collections/${{env.NAMESPACE}}/${{env.COLLECTION_NAME}}
         env:
           TEST_ENV: xyz
