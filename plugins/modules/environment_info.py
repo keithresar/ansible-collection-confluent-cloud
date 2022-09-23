@@ -95,9 +95,9 @@ def get_environments_info(confluent):
     resources = confluent.query()
 
     if confluent.module.params.get('ids'):
-        environments = filter(lambda d: d.id in confluent.module.params.get('ids'), resources['data'])
+        environments = [e for e in resources['data'] if e['id'] in confluent.module.params.get('ids')]
     elif confluent.module.params.get('names'):
-        environments = filter(lambda d: d.display_name in confluent.module.params.get('names'), resources['data'])
+        environments = [e for e in resources['data'] if e['display_name'] in confluent.module.params.get('names')]
     else:
         environments = resources['data']
 
