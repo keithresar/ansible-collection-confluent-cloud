@@ -101,7 +101,7 @@ def get_environments_info(confluent):
     else:
         environments = resources['data']
 
-    return({e['id']:e for e in environments})
+    return({e['id']: e for e in environments})
 
 
 def main():
