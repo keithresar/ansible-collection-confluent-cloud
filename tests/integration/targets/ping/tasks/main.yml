@@ -22,11 +22,12 @@
     api_key: 'xx'
     api_secret: 'xxxx'
   register: result_fail
+  ignore_errors: yes
   check_mode: true
 
 - name: Verify test failed
   ansible.builtin.assert:
     that:
-      - result_fail.meta.ping=="pong"
+      - result_fail is failed
 
 
