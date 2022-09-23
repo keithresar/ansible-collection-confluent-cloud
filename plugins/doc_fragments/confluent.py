@@ -17,7 +17,6 @@ class ModuleDocFragment(object):
           description: Confluent Cloud API Secret
           type: str
           required: true
-          no_log: true
         api_timeout:
           description: Timeout used for the API requests.
           type: int

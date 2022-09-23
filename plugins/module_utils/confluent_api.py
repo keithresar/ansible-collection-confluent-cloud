@@ -29,6 +29,7 @@ def confluent_argument_spec():
             type="str",
             fallback=(env_fallback, ["CONFLUENT_API_KEY"]),
             required=True,
+            no_log=False,
         ),
         api_secret=dict(
             type="str",
