@@ -1,10 +1,5 @@
 ---
 
-#- module_defaults:
-#    confluent.cloud.ping:
-#      api_key: '{{ api_key }}'
-#      api_secret: '{{ api_secret }}'
-
 - name: Exec ping succeed
   confluent.cloud.ping:
     api_key: '{{ api_key }}'
