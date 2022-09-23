@@ -14,7 +14,7 @@ DOCUMENTATION = """
 module: environment_info
 short_description: Get information on existing environments
 description:
-  - Verify connectivity and auth the Confluent Cloud API endpoint
+  - Enumerate and filter environments within Confluent Cloud
 version_added: "0.0.1"
 author: "Keith Resar (@keithresar)"
 extends_documentation_fragment:
