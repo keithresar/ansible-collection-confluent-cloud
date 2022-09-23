@@ -28,31 +28,6 @@ EXAMPLES = """
 
 RETURN = """
 ---
-cc_api:
-  description: Response from Confluent Coud API with a few additions/modification.
-  returned: success
-  type: dict
-  contains:
-    api_timeout:
-      description: Timeout used for the API requests.
-      returned: success
-      type: int
-      sample: 60
-    api_retries:
-      description: Amount of max retries for the API requests.
-      returned: success
-      type: int
-      sample: 5
-    api_retry_max_delay:
-      description: Exponential backoff delay in seconds between retries up to this max delay value.
-      returned: success
-      type: int
-      sample: 12
-    api_endpoint:
-      description: Endpoint used for the API requests.
-      returned: success
-      type: str
-      sample: "https://api.vultr.com/v2"
 ping:
   description: Response
   returned: success
