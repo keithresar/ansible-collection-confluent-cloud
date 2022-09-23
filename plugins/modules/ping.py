@@ -18,7 +18,7 @@ description:
 version_added: "0.0.1"
 author: "Keith Resar (@keithresar)"
 extends_documentation_fragment:
-  - confleunt.cloud.confluent
+  - confluent.cloud.confluent
 """
 
 EXAMPLES = """
@@ -67,7 +67,6 @@ ping:
 
 from ansible.module_utils.basic import AnsibleModule
 
-#from ..module_utils.cc_api import AnsibleConfluent, confluent_argument_spec
 from ansible_collections.confluent.cloud.plugins.module_utils.cc_api import AnsibleConfluent, confluent_argument_spec
 
 
