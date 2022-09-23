@@ -5,15 +5,28 @@
 #      api_key: '{{ api_key }}'
 #      api_secret: '{{ api_secret }}'
 
-- name: Exec ping
+- name: Exec ping succeed
   confluent.cloud.ping:
     api_key: '{{ api_key }}'
     api_secret: '{{ api_secret }}'
-  register: result
+  register: result_success
   check_mode: true
 
-- name: verify test returned pong
+- name: Verify test returned pong
   ansible.builtin.assert:
     that:
-      - result.meta.ping=="pong"
+      - result_success.meta.ping=="pong"
+
+- name: Exec ping fail
+  confluent.cloud.ping:
+    api_key: 'xx'
+    api_secret: 'xxxx'
+  register: result_fail
+  check_mode: true
+
+- name: Verify test failed
+  ansible.builtin.assert:
+    that:
+      - result_fail.meta.ping=="pong"
+
 
