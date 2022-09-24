@@ -91,13 +91,18 @@ from ansible.module_utils._text import to_native
 from ansible_collections.confluent.cloud.plugins.module_utils.confluent_api import AnsibleConfluent, confluent_argument_spec
 
 
-def get_environments_info(confluent):
+def get_environments_info(module):
+    confluent = AnsibleConfluent(
+        module=module,
+        resource_path="/org/v2/environments",
+    )
+
     resources = confluent.query()
 
-    if confluent.module.params.get('ids'):
-        environments = [e for e in resources['data'] if e['id'] in confluent.module.params.get('ids')]
-    elif confluent.module.params.get('names'):
-        environments = [e for e in resources['data'] if e['display_name'] in confluent.module.params.get('names')]
+    if module.params.get('ids'):
+        environments = [e for e in resources['data'] if e['id'] in module.params.get('ids')]
+    elif module.params.get('names'):
+        environments = [e for e in resources['data'] if e['display_name'] in module.params.get('names')]
     else:
         environments = resources['data']
 
@@ -117,13 +122,8 @@ def main():
         ]
     )
 
-    confluent = AnsibleConfluent(
-        module=module,
-        resource_path="/org/v2/environments",
-    )
-
     try:
-        module.exit_json(**get_environments_info(confluent))
+        module.exit_json(**get_environments_info(module))
     except Exception as e:
         module.fail_json(msg='failed to get environment info, error: %s' %
                          (to_native(e)), exception=traceback.format_exc())

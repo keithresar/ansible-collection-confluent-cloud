@@ -20,20 +20,37 @@ author: "Keith Resar (@keithresar)"
 extends_documentation_fragment:
   - confluent.cloud.confluent
 options:
-  names:
-    description: List of environment Names
-    type: list
-    elements: str
-  ids:
-    description: List of environment Ids
-    type: list
-    elements: str
+  id:
+    description: Environment Id
+    type: str
+  name:
+    description: Environment name
+    type: str
+  state:
+    description: 
+      - If `absent`, the environment and all objects (clusters, service accounts) will be removed.
+        Note that absent will not cause Environment to fail if the Environment does not exist.
+      - If `present`, the environment will be created.
+    options:
+      - absent
+      - present
+    type: str
 """
 
 EXAMPLES = """
 - name: Create new environment
   confluent.cloud.environment:
     name: test_env
+    state: present
+- name: Delete existing environment by name
+  confluent.cloud.environment:
+    name: test_env
+    state: absent
+- name: Modify existing environment by Id
+  confluent.cloud.environment:
+    id: env-dsh38dja
+    name: test_env_new
+    state: present
 """
 
 RETURN = """
@@ -83,6 +100,7 @@ from ansible_collections.confluent.cloud.plugins.module_utils.confluent_api impo
 from environments_info import get_environments_info
 
 
+def environment_present(module):
 """
 def get_environments_info(confluent):
     resources = confluent.query()
@@ -99,26 +117,19 @@ def get_environments_info(confluent):
 
 def main():
     argument_spec = confluent_argument_spec()
-    argument_spec['ids'] = dict(type='list', elements='str')
-    argument_spec['names'] = dict(type='list', elements='str')
+    argument_spec['id'] = dict(type='str')
+    argument_spec['name'] = dict(type='str')
+    argument_spec['state'] = dict(default='present', choices=['present', 'absent'])
 
     module = AnsibleModule(
         argument_spec=argument_spec,
         supports_check_mode=True,
-        mutually_exclusive=[
-            ('ids', 'names')
-        ]
-    )
-
-    confluent = AnsibleConfluent(
-        module=module,
-        resource_path="/org/v2/environments",
     )
 
     try:
         module.exit_json(**get_environments_info(confluent))
     except Exception as e:
-        module.fail_json(msg='failed to get environment info, error: %s' %
+        module.fail_json(msg='failed to get environment, error: %s' %
                          (to_native(e)), exception=traceback.format_exc())
 
 
