@@ -97,23 +97,46 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils._text import to_native
 
 from ansible_collections.confluent.cloud.plugins.module_utils.confluent_api import AnsibleConfluent, confluent_argument_spec
-from environments_info import get_environments_info
 
 
-def environment_present(module):
-"""
-def get_environments_info(confluent):
+def environment_remove(module,resource_id):
+    confluent = AnsibleConfluent(
+        module=module,
+        resource_path="/org/v2/environments",
+        resource_key_id=resource_id
+    )
+    return(confluent.absent())
+
+def get_environments(module):
+    confluent = AnsibleConfluent(
+        module=module,
+        resource_path="/org/v2/environments",
+    )
+
     resources = confluent.query()
+    return(resources['data'])
 
-    if confluent.module.params.get('ids'):
-        environments = [e for e in resources['data'] if e['id'] in confluent.module.params.get('ids')]
-    elif confluent.module.params.get('names'):
-        environments = [e for e in resources['data'] if e['display_name'] in confluent.module.params.get('names')]
+def environment_process(module):
+    # Get existing environment if it exists
+    environments = get_environments(module)
+    #return({'a':environments})
+    if module.params.get('id') and \
+       len([e for e in environments if e['id'] in module.params.get('id')]):
+        environment = [e for e in environments if e['id'] in module.params.get('id')][0]
+    elif module.params.get('name') and \
+         len([e for e in environments if e['display_name'] in module.params.get('name')]):
+        environment = [e for e in environments if e['display_name'] in module.params.get('name')][0]
     else:
-        environments = resources['data']
+        environment = None
 
-    return({e['id']: e for e in environments})
-"""
+    # Manage environment removal
+    if module.params.get('state') == 'absent' and not environment:
+        return({"changed": False})
+    elif module.params.get('state') == 'absent' and environment:
+        return(environment_remove(module,environment['id']))
+
+    # TODO - if state: present indicate if it matches
+    # TODO -    if no match then change.
 
 def main():
     argument_spec = confluent_argument_spec()
@@ -127,7 +150,7 @@ def main():
     )
 
     try:
-        module.exit_json(**get_environments_info(confluent))
+        module.exit_json(**environment_process(module))
     except Exception as e:
         module.fail_json(msg='failed to get environment, error: %s' %
                          (to_native(e)), exception=traceback.format_exc())

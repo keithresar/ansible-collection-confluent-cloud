@@ -329,7 +329,6 @@ class AnsibleConfluent:
                 resource = self.query_by_id(resource_id=resource[self.resource_key_id])
         return resource
 
-    """
     def absent(self):
         resource = self.query()
         if resource:
@@ -338,13 +337,13 @@ class AnsibleConfluent:
             self.result["diff"]["before"] = dict(**resource)
             self.result["diff"]["after"] = dict()
 
-            if not self.module.check_mode:
+            #if not self.module.check_mode:
+            if False:
                 self.api_query(
                     path="%s/%s" % (self.resource_path, resource[self.resource_key_id]),
                     method="DELETE",
                 )
         self.get_result(resource)
-    """
 
     """
     def transform_result(self, resource):
