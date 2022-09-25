@@ -103,12 +103,6 @@ class AnsibleConfluent:
         self.result = {
             "changed": False,
             "diff": dict(before=dict(), after=dict()),
-            "confluent_api": {
-                "api_timeout": module.params["api_timeout"],
-                "api_retries": module.params["api_retries"],
-                "api_retry_max_delay": module.params["api_retry_max_delay"],
-                "api_endpoint": module.params["api_endpoint"],
-            },
         }
 
         auth = "%s:%s" % (self.module.params["api_key"],
@@ -258,27 +252,20 @@ class AnsibleConfluent:
         return resource
     """
 
-    def create_or_update(self):
-        resource = self.query()
-        if not resource:
-            resource = self.create()
-        else:
-            resource = self.update(resource)
-        return resource
+#    def create_or_update(self):
+#        resource = self.query()
+#        if not resource:
+#            resource = self.create()
+#        else:
+#            resource = self.update(resource)
+#        return resource
 
-    def present(self):
-        self.get_result(self.create_or_update())
+#    def present(self):
+#        self.get_result(self.create_or_update())
 
-    def create(self):
-        data = dict()
-        for param in self.resource_create_param_keys:
-            data[param] = self.module.params.get(param)
-
+    def create(self, data):
         self.result["changed"] = True
         resource = dict()
-
-        self.result["diff"]["before"] = dict()
-        self.result["diff"]["after"] = data
 
         if not self.module.check_mode:
             resource = self.api_query(
@@ -286,28 +273,14 @@ class AnsibleConfluent:
                 method="POST",
                 data=data,
             )
-#       #return resource.get(self.resource_result_key_singular) if resource else dict()
+        resource['changed'] = True
+        return(resource)
 
-    """
-    def is_diff(self, param, resource):
-        value = self.module.params.get(param)
-        if value is None:
-            return False
+    def update(self, data):
+        # TODO - get obj with current id
+        # TODO - confirm if any elements require change
+        # TODO - implement change
 
-        if param not in resource:
-            self.module.fail_json(msg="Can not diff, key %s not found in resource" % param)
-
-        if isinstance(value, list):
-            for v in value:
-                if v not in resource[param]:
-                    return True
-        elif resource[param] != value:
-            return True
-
-        return False
-    """
-
-    def update(self, resource):
         data = dict()
 
         for param in self.resource_update_param_keys:
@@ -330,25 +303,12 @@ class AnsibleConfluent:
         return resource
 
     def absent(self):
-        resource = self.query()
-        if resource:
-            self.result["changed"] = True
-
-            self.result["diff"]["before"] = dict(**resource)
-            self.result["diff"]["after"] = dict()
-
-            #if not self.module.check_mode:
-            if False:
-                self.api_query(
-                    path="%s/%s" % (self.resource_path, resource[self.resource_key_id]),
-                    method="DELETE",
-                )
-        self.get_result(resource)
-
-    """
-    def transform_result(self, resource):
-        return resource
-    """
+        if not self.module.check_mode:
+            self.api_query(
+                path="%s/%s" % (self.resource_path, self.resource_key_id),
+                method="DELETE",
+            )
+        return({'changed': True, 'id': self.resource_key_id})
 
     def get_result(self, resource):
         self.module.exit_json(**self.result)
