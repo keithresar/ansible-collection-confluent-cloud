@@ -126,7 +126,7 @@ def get_environments(module):
 def environment_process(module):
     # Get existing environment if it exists
     environments = get_environments(module)
-#    return({'a':environments})
+    #return({'a':environments})
     if module.params.get('id') and \
        len([e for e in environments if e['id'] in module.params.get('id')]):
         environment = [e for e in environments if e['id'] in module.params.get('id')][0]

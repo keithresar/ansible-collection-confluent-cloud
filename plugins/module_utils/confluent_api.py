@@ -6,6 +6,7 @@ from __future__ import absolute_import, division, print_function
 
 __metaclass__ = type
 
+import re
 import random
 import time
 import base64
@@ -154,8 +155,15 @@ class AnsibleConfluent:
             # be polite.  Use exponential backoff plus a little bit of randomness
             backoff(retry=retry, retry_max_delay=retry_max_delay)
 
+        #def api_query(self, path, method="GET", data=None):
         # Success with content
         if info["status"] in (200, 201, 202):
+            # Request subsequent page if next
+            resp = self.module.from_json(to_text(resp_body, errors="surrogate_or_strict"))
+            if 'metadata' in resp and 'next' in resp['metadata']:
+                # "next": "https://api.confluent.cloud/org/v2/environments?page_token=eyJpZCI
+                resp = self.api_query(re.sub("
+
             return self.module.from_json(to_text(resp_body, errors="surrogate_or_strict"))
 
         # Success without content
