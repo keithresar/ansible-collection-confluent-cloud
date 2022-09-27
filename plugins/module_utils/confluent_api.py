@@ -314,31 +314,24 @@ class AnsibleConfluent:
         resource['changed'] = True
         return(resource)
 
-    def update(self, data):
-        # TODO - get obj with current id
-        # TODO - confirm if any elements require change
-        # TODO - implement change
+    def update(self, cur_state, target_state):
+        resource = {'changed': False}
 
-        data = dict()
+        for key in target_state.keys():
+            if key not in cur_state or cur_state[key]!=target_state[key]:
+                resource['changed'] = True
+                break
 
-        for param in self.resource_update_param_keys:
-            if self.is_diff(param, resource):
-                self.result["changed"] = True
-                data[param] = self.module.params.get(param)
-
-        if self.result["changed"]:
-            self.result["diff"]["before"] = dict(**resource)
-            self.result["diff"]["after"] = dict(**resource)
-            self.result["diff"]["after"].update(data)
-
+        if resource["changed"]:
             if not self.module.check_mode:
-                self.api_query(
-                    path="%s/%s" % (self.resource_path, resource[self.resource_key_id]),
+                resource = self.api_query(
+                    path="%s/%s" % (self.resource_path, self.resource_key_id),
                     method=self.resource_update_method,
-                    data=data,
+                    data=target_state,
                 )
-                resource = self.query_by_id(resource_id=resource[self.resource_key_id])
-        return resource
+                resource['changed'] = True
+
+        return(resource)
 
     def absent(self):
         if not self.module.check_mode:
@@ -348,5 +341,3 @@ class AnsibleConfluent:
             )
         return({'changed': True, 'id': self.resource_key_id})
 
-    def get_result(self, resource):
-        self.module.exit_json(**self.result)

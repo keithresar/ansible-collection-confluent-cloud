@@ -105,6 +105,7 @@ def environment_remove(module,resource_id):
         resource_path="/org/v2/environments",
         resource_key_id=resource_id
     )
+
     return(confluent.absent())
 
 def environment_create(module):
@@ -112,7 +113,19 @@ def environment_create(module):
         module=module,
         resource_path="/org/v2/environments",
     )
+
     return(confluent.create({'display_name': module.params.get('name')}))
+
+def environment_update(module,environment):
+    confluent = AnsibleConfluent(
+        module=module,
+        resource_path="/org/v2/environments",
+        resource_key_id=environment['id']
+    )
+
+    return(confluent.update(environment,{
+                'display_name': module.params.get('name'),
+            }))
 
 def get_environments(module):
     confluent = AnsibleConfluent(
@@ -142,8 +155,13 @@ def environment_process(module):
     elif module.params.get('state') == 'absent' and environment:
         return(environment_remove(module,environment['id']))
 
-    if module.params.get('state') == 'present' and not environment:
+    # Create environment
+    elif module.params.get('state') == 'present' and not environment:
         return(environment_create(module))
+
+    # Check for update
+    else:
+        return(environment_update(module,environment))
 
     # TODO - if state: present indicate if it matches
     # TODO -    if no match then change.
