@@ -5,4 +5,3 @@
     api_key: '{{ api_key }}'
     api_secret: '{{ api_secret }}'
   check_mode: true
-

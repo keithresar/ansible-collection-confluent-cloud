@@ -27,7 +27,7 @@ options:
     description: Environment name
     type: str
   state:
-    description: 
+    description:
       - If `absent`, the environment and all objects (clusters, service accounts) will be removed.
         Note that absent will not cause Environment to fail if the Environment does not exist.
       - If `present`, the environment will be created.
@@ -100,7 +100,7 @@ from ansible.module_utils._text import to_native
 from ansible_collections.confluent.cloud.plugins.module_utils.confluent_api import AnsibleConfluent, confluent_argument_spec
 
 
-def environment_remove(module,resource_id):
+def environment_remove(module, resource_id):
     confluent = AnsibleConfluent(
         module=module,
         resource_path="/org/v2/environments",
@@ -108,6 +108,7 @@ def environment_remove(module,resource_id):
     )
 
     return(confluent.absent())
+
 
 def environment_create(module):
     confluent = AnsibleConfluent(
@@ -117,16 +118,17 @@ def environment_create(module):
 
     return(confluent.create({'display_name': module.params.get('name')}))
 
-def environment_update(module,environment):
+def environment_update(module, environment):
     confluent = AnsibleConfluent(
         module=module,
         resource_path="/org/v2/environments",
         resource_key_id=environment['id']
     )
 
-    return(confluent.update(environment,{
+    return(confluent.update(environment, {
                 'display_name': module.params.get('name'),
             }))
+
 
 def get_environments(module):
     confluent = AnsibleConfluent(
@@ -137,15 +139,16 @@ def get_environments(module):
     resources = confluent.query()
     return(resources['data'])
 
+
 def environment_process(module):
     # Get existing environment if it exists
     environments = get_environments(module)
     #return({'a':environments})
     if module.params.get('id') and \
-       len([e for e in environments if e['id'] in module.params.get('id')]):
+      len([e for e in environments if e['id'] in module.params.get('id')]):
         environment = [e for e in environments if e['id'] in module.params.get('id')][0]
     elif module.params.get('name') and \
-         len([e for e in environments if e['display_name'] in module.params.get('name')]):
+      len([e for e in environments if e['display_name'] in module.params.get('name')]):
         environment = [e for e in environments if e['display_name'] in module.params.get('name')][0]
     else:
         environment = None
@@ -154,7 +157,7 @@ def environment_process(module):
     if module.params.get('state') == 'absent' and not environment:
         return({"changed": False})
     elif module.params.get('state') == 'absent' and environment:
-        return(environment_remove(module,environment['id']))
+        return(environment_remove(module, environment['id']))
 
     # Create environment
     elif module.params.get('state') == 'present' and not environment:
@@ -162,10 +165,11 @@ def environment_process(module):
 
     # Check for update
     else:
-        return(environment_update(module,environment))
+        return(environment_update(module, environment))
 
     # TODO - if state: present indicate if it matches
     # TODO -    if no match then change.
+
 
 def main():
     argument_spec = confluent_argument_spec()

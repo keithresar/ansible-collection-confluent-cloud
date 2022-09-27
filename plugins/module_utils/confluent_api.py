@@ -153,7 +153,6 @@ class AnsibleConfluent:
         else:
             return([])
 
-
     def api_query(self, path, method="GET", data=None):
 
         if method == "GET" and data:
@@ -318,7 +317,7 @@ class AnsibleConfluent:
         resource = {'changed': False}
 
         for key in target_state.keys():
-            if key not in cur_state or cur_state[key]!=target_state[key]:
+            if key not in cur_state or cur_state[key] != target_state[key]:
                 resource['changed'] = True
                 break
 
