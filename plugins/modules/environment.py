@@ -31,7 +31,8 @@ options:
       - If `absent`, the environment and all objects (clusters, service accounts) will be removed.
         Note that absent will not cause Environment to fail if the Environment does not exist.
       - If `present`, the environment will be created.
-    options:
+    default: present
+    choices:
       - absent
       - present
     type: str

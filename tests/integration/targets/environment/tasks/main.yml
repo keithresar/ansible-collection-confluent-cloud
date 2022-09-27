@@ -13,12 +13,12 @@
     api_secret: '{{ api_secret }}'
     name: 'integration-test-env'
     state: present
-  register: result
+  register: result_env
 - name: Verify environment created
   ansible.builtin.assert:
     that:
-      - result.id
-      - result.display_name=='integration-test-env'
+      - result_env.id
+      - result_env.display_name=='integration-test-env'
 
 - name: Update test environment
   confluent.cloud.environment:
@@ -50,4 +50,3 @@
   ansible.builtin.assert:
     that:
       - result_env.id not in result
-

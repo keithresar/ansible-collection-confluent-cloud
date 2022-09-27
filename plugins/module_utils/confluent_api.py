@@ -149,7 +149,7 @@ class AnsibleConfluent:
                 resp['data'] += self.api_next_page(resp['metadata']['next'])
 
             return(resp['data'])
-        
+
         else:
             return([])
 
@@ -340,4 +340,3 @@ class AnsibleConfluent:
                 method="DELETE",
             )
         return({'changed': True, 'id': self.resource_key_id})
-
