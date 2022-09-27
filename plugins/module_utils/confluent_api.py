@@ -120,6 +120,40 @@ class AnsibleConfluent:
     def configure(self):
         pass
 
+    def api_next_page(self, uri):
+
+        info = dict()
+        resp_body = None
+        for retry in range(0, self.module.params["api_retries"]):
+            resp, info = fetch_url(
+                self.module,
+                uri,
+                headers=self.headers,
+                timeout=self.module.params["api_timeout"],
+            )
+
+            resp_body = resp.read() if resp is not None else ""
+
+            # Check for 429 Too Many Requests
+            if info["status"] != 429:
+                break
+
+            # Confluent Cloud has a rate limiting requests per second, try to
+            # be polite.  Use exponential backoff plus a little bit of randomness
+            backoff(retry=retry, retry_max_delay=self.module.params["api_retry_max_delay"])
+
+        if info["status"] in (200, 201, 202):
+            # Request subsequent page if next
+            resp = self.module.from_json(to_text(resp_body, errors="surrogate_or_strict"))
+            if 'metadata' in resp and 'next' in resp['metadata']:
+                resp['data'] += self.api_next_page(resp['metadata']['next'])
+
+            return(resp['data'])
+        
+        else:
+            return([])
+
+
     def api_query(self, path, method="GET", data=None):
 
         if method == "GET" and data:
@@ -130,8 +164,6 @@ class AnsibleConfluent:
                 data = urllib.parse.urlencode(data_encoded)
         else:
             data = self.module.jsonify(data)
-
-        retry_max_delay = self.module.params["api_retry_max_delay"]
 
         info = dict()
         resp_body = None
@@ -153,18 +185,16 @@ class AnsibleConfluent:
 
             # Confluent Cloud has a rate limiting requests per second, try to
             # be polite.  Use exponential backoff plus a little bit of randomness
-            backoff(retry=retry, retry_max_delay=retry_max_delay)
+            backoff(retry=retry, retry_max_delay=self.module.params["api_retry_max_delay"])
 
-        #def api_query(self, path, method="GET", data=None):
         # Success with content
         if info["status"] in (200, 201, 202):
             # Request subsequent page if next
             resp = self.module.from_json(to_text(resp_body, errors="surrogate_or_strict"))
             if 'metadata' in resp and 'next' in resp['metadata']:
-                # "next": "https://api.confluent.cloud/org/v2/environments?page_token=eyJpZCI
-                resp = self.api_query(re.sub("
+                resp['data'] += self.api_next_page(resp['metadata']['next'])
 
-            return self.module.from_json(to_text(resp_body, errors="surrogate_or_strict"))
+            return(resp)
 
         # Success without content
         if info["status"] in (404, 204):
