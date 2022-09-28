@@ -51,16 +51,24 @@ EXAMPLES = """
 
 RETURN = """
 ---
-enviroment_info:
-  description: Dictionary of matching envrionments.
+environments:
+  description: Dictionary of matching envrionments, keyed by environment id
   returned: success
   type: dict
   contains:
-    api_version: str
-    name: str
-    id: str
-    kind: str
-    metadata: dict
+    name:
+      desription: Environment name
+      type: str
+      returned: success
+    id:
+      desription: Environment id
+      type: str
+      returned: success
+      sample: env-9v5v5
+    metadata:
+      desription: Environment metadata, including create timestamp and updated timestamp
+      type: dict
+      returned: success
 """
 
 import traceback

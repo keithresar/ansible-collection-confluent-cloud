@@ -30,10 +30,9 @@ RETURN = """
 ---
 ping:
   description: Response
-  returned: pong
+  returned: success
   type: str
-  contains:
-    ping: str:
+  sample: pong
 """
 
 from ansible.module_utils.basic import AnsibleModule
@@ -57,7 +56,7 @@ def main():
     resources = confluent.query()
 
     if 'kind' in resources and resources['kind'] == 'EnvironmentList':
-        confluent.module.exit_json(changed=False, meta={"ping": "pong"})
+        confluent.module.exit_json(changed=False, ping="pong")
     else:
         module.fail_json(
             msg='Ping failure',
