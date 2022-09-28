@@ -244,27 +244,27 @@ class AnsibleConfluent:
             result_key=self.resource_result_key_plural,
         )
 
-    def query_by_id(self, resource_id=None, path=None, result_key=None):
-        # Defaults
-        path = path or self.resource_path
-
-        resource = self.api_query(path="%s%s" % (path, "/" + resource_id if resource_id else resource_id))
-        if resource:
-            return resource[result_key]
-
-        return dict()
+#    def query_by_id(self, resource_id=None, path=None, result_key=None):
+#        # Defaults
+#        path = path or self.resource_path
+#
+#        resource = self.api_query(path="%s%s" % (path, "/" + resource_id if resource_id else resource_id))
+#        if resource:
+#            return resource[result_key]
+#
+#        return dict()
 
     def query(self):
         # Returns a single dict representing the resource
         resources = self.api_query(path=self.resource_path)
         return(resources)
 
-    def query_list(self, path=None, result_key=None, query_params=None):
-        # Defaults
-        path = path or self.resource_path
-        result_key = result_key or self.resource_result_key_plural
-
-        resources = self.api_query(path=path, data=query_params)
+#    def query_list(self, path=None, result_key=None, query_params=None):
+#        # Defaults
+#        path = path or self.resource_path
+#        result_key = result_key or self.resource_result_key_plural
+#
+#        resources = self.api_query(path=path, data=query_params)
 #       #return resources[result_key] if resources else []
 #       #self.module.fail_json(
 #       #    msg='',
