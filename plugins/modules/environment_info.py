@@ -69,9 +69,6 @@ environments:
       description: Environment metadata, including create timestamp and updated timestamp
       type: dict
       returned: success
-      sample:
-        created_at: 2021-08-25T03:11:02.276052Z
-        updated_at: 2021-08-25T03:28:22.311962Z
 """
 
 import traceback

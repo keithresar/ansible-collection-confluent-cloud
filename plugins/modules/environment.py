@@ -56,31 +56,6 @@ EXAMPLES = """
 
 RETURN = """
 ---
-confluent_api:
-  description: Response from Confluent Coud API with a few additions/modification.
-  returned: success
-  type: dict
-  contains:
-    api_timeout:
-      description: Timeout used for the API requests.
-      returned: success
-      type: int
-      sample: 60
-    api_retries:
-      description: Amount of max retries for the API requests.
-      returned: success
-      type: int
-      sample: 5
-    api_retry_max_delay:
-      description: Exponential backoff delay in seconds between retries up to this max delay value.
-      returned: success
-      type: int
-      sample: 12
-    api_endpoint:
-      description: Endpoint used for the API requests.
-      returned: success
-      type: str
-      sample: https://api.confluent.cloud
 enviroment_info:
   description: Response
   returned: success
@@ -128,7 +103,7 @@ def environment_update(module, environment):
 
     return(confluent.update(environment, {
         'display_name': module.params.get('name'),
-      }))
+    }))
 
 
 def get_environments(module):
@@ -145,10 +120,10 @@ def environment_process(module):
     # Get existing environment if it exists
     environments = get_environments(module)
     if module.params.get('id') and \
-    len([e for e in environments if e['id'] in module.params.get('id')]):
+     len([e for e in environments if e['id'] in module.params.get('id')]):
         environment = [e for e in environments if e['id'] in module.params.get('id')][0]
     elif module.params.get('name') and \
-    len([e for e in environments if e['display_name'] in module.params.get('name')]):
+     len([e for e in environments if e['display_name'] in module.params.get('name')]):
         environment = [e for e in environments if e['display_name'] in module.params.get('name')][0]
     else:
         environment = None
