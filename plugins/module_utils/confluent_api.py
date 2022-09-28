@@ -285,7 +285,6 @@ class AnsibleConfluent:
 #        self.get_result(self.create_or_update())
 
     def create(self, data):
-        self.result["changed"] = True
         resource = dict()
 
         if not self.module.check_mode:

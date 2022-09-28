@@ -56,16 +56,19 @@ EXAMPLES = """
 
 RETURN = """
 ---
-enviroment_info:
-  description: Response
+display_name:
+  description: Environment name
+  type: str
   returned: success
+id:
+  description: Environment id
+  type: str
+  returned: success
+  sample: env-9v5v5
+metadata:
+  description: Environment metadata, including create timestamp and updated timestamp
   type: dict
-  contains:
-    status:
-      description: Status.
-      returned: success
-      type: str
-      sample: success
+  returned: success
 """
 
 import traceback
@@ -119,8 +122,7 @@ def get_environments(module):
 def environment_process(module):
     # Get existing environment if it exists
     environments = get_environments(module)
-    if module.params.get('id') and \
-       len([e for e in environments if e['id'] in module.params.get('id')]):
+    if module.params.get('id') and len([e for e in environments if e['id'] in module.params.get('id')]):
         environment = [e for e in environments if e['id'] in module.params.get('id')][0]
     elif module.params.get('name') and len([e for e in environments if e['display_name'] in module.params.get('name')]):
         environment = [e for e in environments if e['display_name'] in module.params.get('name')][0]
@@ -140,9 +142,6 @@ def environment_process(module):
     # Check for update
     else:
         return(environment_update(module, environment))
-
-    # TODO - if state: present indicate if it matches
-    # TODO -    if no match then change.
 
 
 def main():

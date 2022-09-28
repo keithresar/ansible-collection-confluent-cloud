@@ -56,7 +56,7 @@ environments:
   returned: success
   type: dict
   contains:
-    name:
+    dplay_name:
       description: Environment name
       type: str
       returned: success
