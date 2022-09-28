@@ -69,10 +69,8 @@ class AnsibleConfluent:
         self,
         module,
         resource_path,
-        resource_result_key_plural=None,
         resource_key_name=None,
         resource_key_id="id",
-        resource_get_details=False,
         resource_create_param_keys=None,
         resource_update_param_keys=None,
         resource_update_method="PATCH",
@@ -89,25 +87,9 @@ class AnsibleConfluent:
         # The name key of the resource, usually 'id'
         self.resource_key_id = resource_key_id
 
-        # Some resources need an additional GET request to get all attributes
-        self.resource_get_details = resource_get_details
-
-        # List of params used to create the resource
-        self.resource_create_param_keys = resource_create_param_keys or []
-
-        # List of params used to update the resource
-        self.resource_update_param_keys = resource_update_param_keys or []
-
         # Some resources have PUT, many have PATCH
         self.resource_update_method = resource_update_method
 
-        self.result = {
-            "changed": False,
-            "diff": dict(before=dict(), after=dict()),
-        }
-
-        auth = "%s:%s" % (self.module.params["api_key"],
-                          self.module.params["api_secret"])
         self.headers = {
             "Authorization": "Basic %s" % (base64.standard_b64encode(auth.encode()).decode()),
             "User-Agent": CONFLUENT_USER_AGENT,
@@ -204,45 +186,45 @@ class AnsibleConfluent:
             fetch_url_info=info,
         )
 
-    def query_filter_list_by_name(
-        self,
-        path,
-        key_name,
-        result_key,
-        param_key=None,
-        key_id=None,
-        query_params=None,
-        get_details=False,
-        fail_not_found=False,
-    ):
-        param_value = self.module.params.get(param_key or key_name)
+#    def query_filter_list_by_name(
+#        self,
+#        path,
+#        key_name,
+#        result_key,
+#        param_key=None,
+#        key_id=None,
+#        query_params=None,
+#        get_details=False,
+#        fail_not_found=False,
+#    ):
+#        param_value = self.module.params.get(param_key or key_name)
+#
+#        found = dict()
+#        for resource in self.query_list(path=path, result_key=result_key, query_params=query_params):
+#            if resource.get(key_name) == param_value:
+#                if found:
+#                    self.module.fail_json(msg="More than one record with name=%s found. " "Use multiple=yes if module supports it." % param_value)
+#                found = resource
+#        if found:
+#            if get_details:
+#                return self.query_by_id(resource_id=found[key_id])
+#            else:
+#                return found
+#
+#        elif fail_not_found:
+#            self.module.fail_json(msg="No Resource %s with %s found: %s" % (path, key_name, param_value))
+#
+#        return dict()
 
-        found = dict()
-        for resource in self.query_list(path=path, result_key=result_key, query_params=query_params):
-            if resource.get(key_name) == param_value:
-                if found:
-                    self.module.fail_json(msg="More than one record with name=%s found. " "Use multiple=yes if module supports it." % param_value)
-                found = resource
-        if found:
-            if get_details:
-                return self.query_by_id(resource_id=found[key_id])
-            else:
-                return found
-
-        elif fail_not_found:
-            self.module.fail_json(msg="No Resource %s with %s found: %s" % (path, key_name, param_value))
-
-        return dict()
-
-    def query_filter_list(self):
-        # Returns a single dict representing the resource queryied by name
-        return self.query_filter_list_by_name(
-            key_name=self.resource_key_name,
-            key_id=self.resource_key_id,
-            get_details=self.resource_get_details,
-            path=self.resource_path,
-            result_key=self.resource_result_key_plural,
-        )
+#    def query_filter_list(self):
+#        # Returns a single dict representing the resource queryied by name
+#        return self.query_filter_list_by_name(
+#            key_name=self.resource_key_name,
+#            key_id=self.resource_key_id,
+#            get_details=self.resource_get_details,
+#            path=self.resource_path,
+#            result_key=self.resource_result_key_plural,
+#        )
 
 #    def query_by_id(self, resource_id=None, path=None, result_key=None):
 #        # Defaults
@@ -270,24 +252,24 @@ class AnsibleConfluent:
 #       #    msg='',
 #       #    fetch_url_info=resources,
 #       #)
-        return resources['data'] if resources else []
+#        return resources['data'] if resources else []
 
-    """
-    def wait_for_state(self, resource, key, state, cmp="="):
-        for retry in range(0, 30):
-            resource = self.query_by_id(resource_id=resource[self.resource_key_id])
-            if cmp == "=":
-                if key not in resource or resource[key] == state or not resource[key]:
-                    break
-            else:
-                if key not in resource or resource[key] != state or not resource[key]:
-                    break
-            backoff(retry=retry)
-        else:
-            self.module.fail_json(msg="Wait for %s to become %s timed out" % (key, state))
-
-        return resource
-    """
+#    """
+#    def wait_for_state(self, resource, key, state, cmp="="):
+#        for retry in range(0, 30):
+#            resource = self.query_by_id(resource_id=resource[self.resource_key_id])
+#            if cmp == "=":
+#                if key not in resource or resource[key] == state or not resource[key]:
+#                    break
+#            else:
+#                if key not in resource or resource[key] != state or not resource[key]:
+#                    break
+#            backoff(retry=retry)
+#        else:
+#            self.module.fail_json(msg="Wait for %s to become %s timed out" % (key, state))
+#
+#        return resource
+#    """
 
 #    def create_or_update(self):
 #        resource = self.query()
