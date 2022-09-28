@@ -90,6 +90,8 @@ class AnsibleConfluent:
         # Some resources have PUT, many have PATCH
         self.resource_update_method = resource_update_method
 
+        auth = "%s:%s" % (self.module.params["api_key"],
+                          self.module.params["api_secret"])
         self.headers = {
             "Authorization": "Basic %s" % (base64.standard_b64encode(auth.encode()).decode()),
             "User-Agent": CONFLUENT_USER_AGENT,
