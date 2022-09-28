@@ -14,18 +14,22 @@ DOCUMENTATION = """
 module: environment_info
 short_description: Get information on existing environments
 description:
-  - Enumerate and filter environments within Confluent Cloud
+  - Enumerate and filter environments within Confluent Cloud.
 version_added: "0.0.1"
 author: "Keith Resar (@keithresar)"
 extends_documentation_fragment:
   - confluent.cloud.confluent
 options:
   names:
-    description: List of environment Names
+    description: 
+      - List of environment Names.
+      - Mutually exclusive when used with `ids`
     type: list
     elements: str
   ids:
-    description: List of environment Ids
+    description:
+      - List of environment Ids.
+      - Mutually exclusive when used with `names`
     type: list
     elements: str
 """
@@ -47,41 +51,16 @@ EXAMPLES = """
 
 RETURN = """
 ---
-confluent_api:
-  description: Response from Confluent Coud API with a few additions/modification.
-  returned: success
-  type: dict
-  contains:
-    api_timeout:
-      description: Timeout used for the API requests.
-      returned: success
-      type: int
-      sample: 60
-    api_retries:
-      description: Amount of max retries for the API requests.
-      returned: success
-      type: int
-      sample: 5
-    api_retry_max_delay:
-      description: Exponential backoff delay in seconds between retries up to this max delay value.
-      returned: success
-      type: int
-      sample: 12
-    api_endpoint:
-      description: Endpoint used for the API requests.
-      returned: success
-      type: str
-      sample: https://api.confluent.cloud
 enviroment_info:
-  description: Response
+  description: Dictionary of matching envrionments.
   returned: success
   type: dict
   contains:
-    status:
-      description: Status.
-      returned: success
-      type: str
-      sample: success
+    api_version: str
+    name: str
+    id: str
+    kind: str
+    metadata: dict
 """
 
 import traceback
