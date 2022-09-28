@@ -10,7 +10,7 @@
 - name: Verify test returned pong
   ansible.builtin.assert:
     that:
-      - result_success.meta.ping=="pong"
+      - result_success.ping=="pong"
 
 - name: Exec ping fail
   confluent.cloud.ping:
