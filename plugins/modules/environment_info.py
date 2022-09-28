@@ -21,7 +21,7 @@ extends_documentation_fragment:
   - confluent.cloud.confluent
 options:
   names:
-    description: 
+    description:
       - List of environment Names.
       - Mutually exclusive when used with `ids`
     type: list
@@ -57,16 +57,16 @@ environments:
   type: dict
   contains:
     name:
-      desription: Environment name
+      description: Environment name
       type: str
       returned: success
     id:
-      desription: Environment id
+      description: Environment id
       type: str
       returned: success
       sample: env-9v5v5
     metadata:
-      desription: Environment metadata, including create timestamp and updated timestamp
+      description: Environment metadata, including create timestamp and updated timestamp
       type: dict
       returned: success
 """

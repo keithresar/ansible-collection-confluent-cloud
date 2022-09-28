@@ -118,6 +118,7 @@ def environment_create(module):
 
     return(confluent.create({'display_name': module.params.get('name')}))
 
+
 def environment_update(module, environment):
     confluent = AnsibleConfluent(
         module=module,
@@ -127,7 +128,7 @@ def environment_update(module, environment):
 
     return(confluent.update(environment, {
                 'display_name': module.params.get('name'),
-            }))
+     }))
 
 
 def get_environments(module):
@@ -145,10 +146,10 @@ def environment_process(module):
     environments = get_environments(module)
     #return({'a':environments})
     if module.params.get('id') and \
-      len([e for e in environments if e['id'] in module.params.get('id')]):
+     len([e for e in environments if e['id'] in module.params.get('id')]):
         environment = [e for e in environments if e['id'] in module.params.get('id')][0]
     elif module.params.get('name') and \
-      len([e for e in environments if e['display_name'] in module.params.get('name')]):
+     len([e for e in environments if e['display_name'] in module.params.get('name')]):
         environment = [e for e in environments if e['display_name'] in module.params.get('name')][0]
     else:
         environment = None
